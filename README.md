@@ -2,6 +2,9 @@
 
 An app to solve Algebraic Equations by Numerical Methods
 
+## Check live on Play Store!
+https://play.google.com/store/apps/details?id=com.siddhesh.numerical_methods_mathematics
+
 ## Features
 1. Enter the equation with range and error factor
 2. 'Approximate' button for approximating the result
