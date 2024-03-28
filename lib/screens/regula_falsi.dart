@@ -16,7 +16,7 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
   final _bController = TextEditingController();
   String output = 'Result will appear here';
   String iterations = 'No. of iterations will appear here';
-  String timeTaken = "Algorithm's will appear here";
+  String timeTaken = "Algorithm's execution time will appear here";
   bool takeApproximate = false;
   Color buttonNotSelectedColor = Colors.green;
   Color buttonSelectedColor = Colors.grey;
@@ -32,7 +32,7 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
     ContextModel cm3 = ContextModel();
     ContextModel cm4 = ContextModel();
     ContextModel cm5 = ContextModel();
-    ContextModel cm6 = ContextModel();
+    // ContextModel cm6 = ContextModel();
     cm3.bindVariableName('x', Number(a));
     cm4.bindVariableName('x', Number(b));
     double c = 0;
@@ -170,14 +170,16 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
                       if (takeApproximate) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("The results will be approximate. Please click 'Solve the equation' again!"),
+                            content: Text(
+                                "The results will be approximate. Please click 'Solve the equation' again!"),
                             duration: Duration(seconds: 2),
                           ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("The results will be accurate. Please click 'Solve the equation' again!"),
+                            content: Text(
+                                "The results will be accurate. Please click 'Solve the equation' again!"),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -268,12 +270,18 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
                 onPressed: () {
                   setState(() {
                     try {
+                      final startTime = DateTime.now();
                       ans = regulaFalsi(
                           _textController.text,
                           double.parse(_aController.text),
                           double.parse(_bController.text),
                           tolerance: double.parse(_errorController.text));
-                      output = takeApproximate ? 'Result:- ${ans[0].toStringAsFixed(5)}' : 'Result:- ${ans[0].toString()}';
+                      final endTime = DateTime.now();
+                      timeTaken =
+                          'Execution Time:- ${endTime.difference(startTime).inMicroseconds} μs';
+                      output = takeApproximate
+                          ? 'Result:- ${ans[0].toStringAsFixed(5)}'
+                          : 'Result:- ${ans[0].toString()}';
                       iterations = 'Iterations:- ${ans[1].toInt().toString()}';
                       valuesfA = ans[2].toString();
                       valuesfB = ans[3].toString();
@@ -282,9 +290,8 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
                       valuesBADiff = ans[6].toString();
                       row1 = displayRow(ans);
                       column1 = displayColumn(ans);
-                      //timeTaken = 'Execution Time:- ${ans[2].toString()}';
                     } catch (e) {
-                      print('Error:- $e');
+                      // print('Error:- $e');
                       output = "Please enter double values only";
                     }
                   });
@@ -292,24 +299,27 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
                 child: const Text('Solve the equation')),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: Center(
-                    child: SelectableText(
-                  output,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                )),
-              ),
+              child: Center(
+                  child: SelectableText(
+                output,
+                style: Theme.of(context).textTheme.headlineSmall,
+              )),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
+              child: Center(
+                  child: Text(
+                iterations,
+                style: Theme.of(context).textTheme.headlineSmall,
+              )),
+            ),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Center(
                     child: Text(
-                  iterations,
+                  timeTaken,
                   style: Theme.of(context).textTheme.headlineSmall,
-                )),
-              ),
-            ),
+                ))),
             // Padding(
             //   padding: const EdgeInsets.all(8.0),
             //   child: Container(

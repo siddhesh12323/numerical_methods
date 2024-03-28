@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
-import 'package:numerical_methods_mathematics/screens/bisection_info.dart';
 import 'package:numerical_methods_mathematics/screens/secant_info.dart';
 
 class Secant extends StatefulWidget {
@@ -17,7 +16,7 @@ class _SecantState extends State<Secant> {
   final _bController = TextEditingController();
   String output = 'Result will appear here';
   String iterations = 'No. of iterations will appear here';
-  String timeTaken = "Algorithm's will appear here";
+  String timeTaken = "Algorithm's execution time will appear here";
   bool takeApproximate = false;
   Color buttonNotSelectedColor = Colors.green;
   Color buttonSelectedColor = Colors.grey;
@@ -249,11 +248,15 @@ class _SecantState extends State<Secant> {
                 onPressed: () {
                   setState(() {
                     try {
+                      final startTime = DateTime.now();
                       ans = bisection(
                           _textController.text,
                           double.parse(_aController.text),
                           double.parse(_bController.text),
                           tolerance: double.parse(_errorController.text));
+                      final endTime = DateTime.now();
+                      timeTaken =
+                          'Execution Time:- ${endTime.difference(startTime).inMicroseconds} μs';
                       output = takeApproximate
                           ? 'Result:- ${ans[0].toStringAsFixed(5)}'
                           : 'Result:- ${ans[0].toString()}';
@@ -273,24 +276,27 @@ class _SecantState extends State<Secant> {
                 child: const Text('Solve the equation')),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: Center(
-                    child: SelectableText(
-                  output,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                )),
-              ),
+              child: Center(
+                  child: SelectableText(
+                output,
+                style: Theme.of(context).textTheme.headlineSmall,
+              )),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
+              child: Center(
+                  child: Text(
+                iterations,
+                style: Theme.of(context).textTheme.headlineSmall,
+              )),
+            ),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Center(
                     child: Text(
-                  iterations,
+                  timeTaken,
                   style: Theme.of(context).textTheme.headlineSmall,
-                )),
-              ),
-            ),
+                ))),
             // Padding(
             //   padding: const EdgeInsets.all(8.0),
             //   child: Container(

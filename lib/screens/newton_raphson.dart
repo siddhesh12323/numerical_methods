@@ -17,7 +17,7 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
   //final _bController = TextEditingController();
   String output = 'Result will appear here';
   String iterations = 'No. of iterations will appear here';
-  String timeTaken = "Algorithm's will appear here";
+  String timeTaken = "Algorithm's execution time will appear here";
   bool takeApproximate = false;
   Color buttonNotSelectedColor = Colors.green;
   Color buttonSelectedColor = Colors.grey;
@@ -31,7 +31,7 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
     ContextModel cm1 = ContextModel();
     ContextModel cm2 = ContextModel();
     ContextModel cm3 = ContextModel();
-    ContextModel cm4 = ContextModel();
+    // ContextModel cm4 = ContextModel();
     cm1.bindVariableName('x', Number(x0));
     double fx0 = exp.evaluate(EvaluationType.REAL, cm1); // f(x)
     int iter = 0;
@@ -243,9 +243,13 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
                 onPressed: () {
                   setState(() {
                     try {
+                      final startTime = DateTime.now();
                       ans = newtonRaphson(
                           _textController.text, double.parse(_aController.text),
                           tolerance: double.parse(_errorController.text));
+                      final endTime = DateTime.now();
+                      timeTaken =
+                          'Execution Time:- ${endTime.difference(startTime).inMicroseconds} μs';
                       output = takeApproximate
                           ? 'Result:- ${ans[0].toStringAsFixed(5)}'
                           : 'Result:- ${ans[0].toString()}';
@@ -256,7 +260,6 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
                       valuesBADiff = ans[5].toString();
                       row1 = displayRow(ans);
                       column1 = displayColumn(ans);
-                      //timeTaken = 'Execution Time:- ${ans[2].toString()}';
                     } catch (e) {
                       output = "Please enter double values only";
                     }
@@ -265,24 +268,27 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
                 child: const Text('Solve the equation')),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: Center(
-                    child: SelectableText(
-                  output,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                )),
-              ),
+              child: Center(
+                  child: SelectableText(
+                output,
+                style: Theme.of(context).textTheme.headlineSmall,
+              )),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
+              child: Center(
+                  child: Text(
+                iterations,
+                style: Theme.of(context).textTheme.headlineSmall,
+              )),
+            ),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Center(
                     child: Text(
-                  iterations,
+                  timeTaken,
                   style: Theme.of(context).textTheme.headlineSmall,
-                )),
-              ),
-            ),
+                ))),
             // Padding(
             //   padding: const EdgeInsets.all(8.0),
             //   child: Container(

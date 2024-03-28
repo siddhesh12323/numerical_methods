@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:numerical_methods_mathematics/screens/about_numerical_methods.dart';
-import 'package:numerical_methods_mathematics/screens/bisection.dart';
-import 'package:numerical_methods_mathematics/screens/newton_raphson.dart';
 import 'package:numerical_methods_mathematics/screens/numerical_methods_options.dart';
-import 'package:numerical_methods_mathematics/screens/regula_falsi.dart';
-import 'package:numerical_methods_mathematics/screens/secant.dart';
 
 import 'about_me.dart';
 
