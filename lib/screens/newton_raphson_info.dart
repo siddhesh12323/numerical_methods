@@ -62,7 +62,7 @@ class NewtonRaphsonInfo extends StatelessWidget {
             child: ListTile(
               leading: const Text('d.'),
               title: const Text(
-                  'Enter values of a and b such that f(a) x f(b) < 0. If it is not true the result will be -1'),
+                  'Enter value of a such that the result is near a. If it is not true the result will be -1'),
               style: Theme.of(context).listTileTheme.style,
             ),
           ),
@@ -105,6 +105,17 @@ class NewtonRaphsonInfo extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
             child: ListTile(
               leading: const Text('h.'),
+              title: const Text(
+                  'If the graph is in loop or returning backwards, the estimate may be far off, try changing the value of a.'),
+              style: Theme.of(context).listTileTheme.style,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+            child: ListTile(
+              leading: const Text('i.'),
               title: InkWell(
                 onTap: () => _launchURL(
                     'https://en.wikipedia.org/wiki/Newton%27s_method'),

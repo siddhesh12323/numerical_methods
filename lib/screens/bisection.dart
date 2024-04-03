@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:numerical_methods_mathematics/screens/bisection_info.dart';
@@ -21,10 +22,10 @@ class _BisectionState extends State<Bisection> {
   Color buttonNotSelectedColor = Colors.green;
   Color buttonSelectedColor = Colors.grey;
   Color buttonColor = Colors.green;
+  List<Map<double, double>> graphPointsOutput = [];
 
   List bisection(String func, double a, double b,
       {int maxIterations = 500, double tolerance = 1e-12}) {
-    //final stopwatch = Stopwatch()..start();
     Parser p1 = Parser();
     Expression exp = p1.parse(func);
     ContextModel cm1 = ContextModel();
@@ -39,12 +40,17 @@ class _BisectionState extends State<Bisection> {
     List valuesListB = [];
     List valuesListA = [];
     List valuesListBADiff = [];
+    List<Map<double, double>> graphPoints = [];
     if (exp.evaluate(EvaluationType.REAL, cm3) *
             exp.evaluate(EvaluationType.REAL, cm4) <
         0) {
       while ((b - a).abs() > tolerance) {
         c = (a + b) / 2;
         cm1.bindVariableName('x', Number(c));
+        graphPoints.add({
+          double.parse(c.toStringAsFixed(2)):
+              exp.evaluate(EvaluationType.REAL, cm1)
+        });
         if (exp.evaluate(EvaluationType.REAL, cm1).abs() < tolerance) {
           return [
             c,
@@ -52,13 +58,15 @@ class _BisectionState extends State<Bisection> {
             valuesListA,
             valuesListB,
             valuesListC,
-            valuesListBADiff
+            valuesListBADiff,
+            graphPoints
           ];
         }
         cm2.bindVariableName('x', Number(a));
         valuesListA.add(a);
         valuesListB.add(b);
         valuesListBADiff.add((b - a));
+        // graphPoints.add({a: exp.evaluate(EvaluationType.REAL, cm3)});
         if (exp.evaluate(EvaluationType.REAL, cm1) *
                 exp.evaluate(EvaluationType.REAL, cm2) <
             0) {
@@ -69,18 +77,25 @@ class _BisectionState extends State<Bisection> {
         valuesListC.add(c);
         iter++;
       }
-      //stopwatch.stop();
       return [
         c,
         iter.toDouble(),
         valuesListA,
         valuesListB,
         valuesListC,
-        valuesListBADiff
+        valuesListBADiff,
+        graphPoints
       ];
     } else {
-      //stopwatch.stop();
-      return [-1, 0, valuesListA, valuesListB, valuesListC, valuesListBADiff];
+      return [
+        -1,
+        0,
+        valuesListA,
+        valuesListB,
+        valuesListC,
+        valuesListBADiff,
+        graphPoints
+      ];
     }
   }
 
@@ -267,6 +282,8 @@ class _BisectionState extends State<Bisection> {
                       valuesBADiff = ans[5].toString();
                       row1 = displayRow(ans);
                       column1 = displayColumn(ans);
+                      graphPointsOutput = ans[6];
+                      // print(graphPointsOutput);
                     } catch (e) {
                       output = "Please enter double values only";
                     }
@@ -296,57 +313,46 @@ class _BisectionState extends State<Bisection> {
                   timeTaken,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ))),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       timeTaken,
-            //       style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // )
-            //* Uncomment for each list
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesA,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesB,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesC,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesBADiff,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
+            const SizedBox(
+              height: 20,
+            ),
+
+            //GRAPH
+            // ignore: sized_box_for_whitespace
+            Container(
+              height: 330,
+              width: MediaQuery.of(context).size.width - 20,
+              child: graphPointsOutput.isNotEmpty
+                  ? LineChart(LineChartData(
+                      lineTouchData: const LineTouchData(
+                          enabled: true, handleBuiltInTouches: true),
+                      lineBarsData: [
+                        LineChartBarData(
+                          isCurved: true,
+                          spots: [
+                            for (int i = 0; i < graphPointsOutput.length; i++)
+                              FlSpot(
+                                  graphPointsOutput[i].keys.first,
+                                  graphPointsOutput[i]
+                                      .values
+                                      .first) //FlSpot(0, 0),
+                          ],
+                          color: Colors.blue,
+                        )
+                      ],
+                      titlesData: const FlTitlesData(
+                        leftTitles: AxisTitles(
+                          axisNameWidget: Text('F(x)'),
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: AxisTitles(),
+                        bottomTitles: AxisTitles(
+                          axisNameWidget: Text('x'),
+                          sideTitles: SideTitles(showTitles: true),
+                        ),
+                      )))
+                  : const Center(child: Text('Graph will appear here')),
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Padding(

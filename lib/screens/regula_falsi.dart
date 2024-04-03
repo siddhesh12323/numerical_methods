@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:numerical_methods_mathematics/screens/regula_falsi_info.dart';
@@ -21,6 +22,7 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
   Color buttonNotSelectedColor = Colors.green;
   Color buttonSelectedColor = Colors.grey;
   Color buttonColor = Colors.green;
+  List<Map<double, double>> graphPointsOutput = [];
 
   List regulaFalsi(String func, double a, double b,
       {int maxIterations = 500, double tolerance = 1e-12}) {
@@ -32,7 +34,6 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
     ContextModel cm3 = ContextModel();
     ContextModel cm4 = ContextModel();
     ContextModel cm5 = ContextModel();
-    // ContextModel cm6 = ContextModel();
     cm3.bindVariableName('x', Number(a));
     cm4.bindVariableName('x', Number(b));
     double c = 0;
@@ -42,6 +43,7 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
     List valuesListfB = [];
     List valuesListfA = [];
     List valuesListBADiff = [];
+    List<Map<double, double>> graphPoints = [];
     if (exp.evaluate(EvaluationType.REAL, cm3) *
             exp.evaluate(EvaluationType.REAL, cm4) <
         0) {
@@ -51,6 +53,7 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
             (exp.evaluate(EvaluationType.REAL, cm4) -
                 exp.evaluate(EvaluationType.REAL, cm3));
         cm1.bindVariableName('x', Number(c));
+        graphPoints.add({c: exp.evaluate(EvaluationType.REAL, cm1)});
         if (exp.evaluate(EvaluationType.REAL, cm1).abs() < tolerance) {
           return [
             c,
@@ -59,7 +62,8 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
             valuesListfB,
             valuesListfC,
             valuesListC,
-            valuesListBADiff
+            valuesListBADiff,
+            graphPoints
           ];
         }
         cm2.bindVariableName('x', Number(a));
@@ -78,10 +82,6 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
         valuesListC.add(c);
         iter++;
       }
-      //cm6.bindVariableName('x', Number(c));
-      // valuesListfC.add(exp.evaluate(EvaluationType.REAL, cm6));
-      // valuesListC.add(c);
-      //stopwatch.stop();
       return [
         c,
         iter.toDouble(),
@@ -89,7 +89,8 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
         valuesListfB,
         valuesListfC,
         valuesListC,
-        valuesListBADiff
+        valuesListBADiff,
+        graphPoints
       ];
     } else {
       //stopwatch.stop();
@@ -100,7 +101,8 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
         valuesListfB,
         valuesListfC,
         valuesListC,
-        valuesListBADiff
+        valuesListBADiff,
+        graphPoints
       ];
     }
   }
@@ -288,6 +290,7 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
                       valuesfC = ans[4].toString();
                       valuesC = ans[5].toString();
                       valuesBADiff = ans[6].toString();
+                      graphPointsOutput = ans[7];
                       row1 = displayRow(ans);
                       column1 = displayColumn(ans);
                     } catch (e) {
@@ -320,62 +323,46 @@ class _RegulaFalsiState extends State<RegulaFalsi> {
                   timeTaken,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ))),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       timeTaken,
-            //       style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // )
-            //* Uncomment for each list
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesfA,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesfB,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesfC,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesC,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesBADiff,
-            //     )),
-            //   ),
-            // ),
+            const SizedBox(
+              height: 20,
+            ),
+
+            //GRAPH
+            // ignore: sized_box_for_whitespace
+            Container(
+              height: 330,
+              width: MediaQuery.of(context).size.width - 20,
+              child: graphPointsOutput.isNotEmpty
+                  ? LineChart(LineChartData(
+                      lineTouchData: const LineTouchData(
+                          enabled: true, handleBuiltInTouches: true),
+                      lineBarsData: [
+                        LineChartBarData(
+                          isCurved: true,
+                          spots: [
+                            for (int i = 0; i < graphPointsOutput.length; i++)
+                              FlSpot(
+                                  graphPointsOutput[i].keys.first,
+                                  graphPointsOutput[i]
+                                      .values
+                                      .first) //FlSpot(0, 0),
+                          ],
+                          color: Colors.blue,
+                        )
+                      ],
+                      titlesData: const FlTitlesData(
+                        leftTitles: AxisTitles(
+                          axisNameWidget: Text('F(x)'),
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: AxisTitles(),
+                        bottomTitles: AxisTitles(
+                          axisNameWidget: Text('x'),
+                          sideTitles: SideTitles(showTitles: true),
+                        ),
+                      )))
+                  : const Center(child: Text('Graph will appear here')),
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Padding(

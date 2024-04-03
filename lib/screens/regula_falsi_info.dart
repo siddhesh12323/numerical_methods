@@ -105,6 +105,17 @@ class RegulaFalsiInfo extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
             child: ListTile(
               leading: const Text('h.'),
+              title: const Text(
+                  'Sometimes Regula Falsi method returns looping graphs.'),
+              style: Theme.of(context).listTileTheme.style,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+            child: ListTile(
+              leading: const Text('i.'),
               title: InkWell(
                 onTap: () =>
                     _launchURL('https://en.wikipedia.org/wiki/Regula_falsi'),

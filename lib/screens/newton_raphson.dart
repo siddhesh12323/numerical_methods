@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 //import 'package:numerical_methods_mathematics/screens/bisection_info.dart';
@@ -22,47 +23,45 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
   Color buttonNotSelectedColor = Colors.green;
   Color buttonSelectedColor = Colors.grey;
   Color buttonColor = Colors.green;
+  List<Map<double, double>> graphPointsOutput = [];
 
   List newtonRaphson(String func, double x0,
       {int maxIterations = 500, double tolerance = 1e-12}) {
-    //final stopwatch = Stopwatch()..start();
     Parser p1 = Parser();
     Expression exp = p1.parse(func);
     ContextModel cm1 = ContextModel();
     ContextModel cm2 = ContextModel();
     ContextModel cm3 = ContextModel();
-    // ContextModel cm4 = ContextModel();
+    List<Map<double, double>> graphPoints = [];
     cm1.bindVariableName('x', Number(x0));
     double fx0 = exp.evaluate(EvaluationType.REAL, cm1); // f(x)
+    graphPoints.add({x0: fx0});
     int iter = 0;
     List valuesListX0 = [];
     List valuesListFX0 = [];
     List valuesListF1X0 = [];
     List valuesListBADiff = [];
-    //Expression expression = Parser().parse(func);
-    //Expression evaluator = expression.simplify();
     Expression derivative = Parser().parse(func).simplify().derive('x');
     cm2.bindVariableName('x', Number(x0));
     double f1x0 = derivative.evaluate(EvaluationType.REAL, cm2); //f1(x)
-    //double x = -1;
     double nextGuess = (x0 - (fx0 / f1x0));
+    ContextModel cm4 = ContextModel();
+    cm4.bindVariableName('x', Number(nextGuess));
+    graphPoints.add({nextGuess: exp.evaluate(EvaluationType.REAL, cm4)});
     valuesListBADiff.add((nextGuess - x0).abs());
-    //print(nextGuess);
-    //print(f1x0);
-    //print(nextGuess - x0);
     while (f1x0 != 0 && (nextGuess - x0).abs() > tolerance) {
       x0 = nextGuess;
       cm3.bindVariableName('x', Number(x0));
-      //cm4.bindVariableName('x', Number(x0));
       ContextModel cm5 = ContextModel();
       cm5.bindVariableName('x', Number(x0));
       fx0 = exp.evaluate(EvaluationType.REAL, cm3);
-      //f1x0 = derivative.evaluate(EvaluationType.REAL, cm4);
       f1x0 = derivative.evaluate(EvaluationType.REAL, cm5);
       valuesListX0.add(x0);
       valuesListFX0.add(fx0);
       valuesListF1X0.add(f1x0);
       nextGuess = (x0 - (fx0 / f1x0));
+      cm4.bindVariableName('x', Number(nextGuess));
+      graphPoints.add({nextGuess: exp.evaluate(EvaluationType.REAL, cm4)});
       valuesListBADiff.add((nextGuess - x0).abs());
       iter++;
       if (iter > 500) {
@@ -75,7 +74,8 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
       valuesListX0,
       valuesListFX0,
       valuesListF1X0,
-      valuesListBADiff
+      valuesListBADiff,
+      graphPoints
     ];
   }
 
@@ -258,6 +258,7 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
                       valuesFX0 = ans[3].toString();
                       valuesF1X0 = ans[4].toString();
                       valuesBADiff = ans[5].toString();
+                      graphPointsOutput = ans[6];
                       row1 = displayRow(ans);
                       column1 = displayColumn(ans);
                     } catch (e) {
@@ -289,57 +290,46 @@ class _NewtonRaphsonState extends State<NewtonRaphson> {
                   timeTaken,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ))),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       timeTaken,
-            //       style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            //* Uncomment for each list
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesX0,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesFX0,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesF1X0,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Container(
-            //     child: Center(
-            //         child: Text(
-            //       valuesBADiff,
-            //       // style: Theme.of(context).textTheme.headlineSmall,
-            //     )),
-            //   ),
-            // ),
+            const SizedBox(
+              height: 20,
+            ),
+
+            //GRAPH
+            // ignore: sized_box_for_whitespace
+            Container(
+              height: 330,
+              width: MediaQuery.of(context).size.width - 20,
+              child: graphPointsOutput.isNotEmpty
+                  ? LineChart(LineChartData(
+                      lineTouchData: const LineTouchData(
+                          enabled: true, handleBuiltInTouches: true),
+                      lineBarsData: [
+                        LineChartBarData(
+                          isCurved: true,
+                          spots: [
+                            for (int i = 0; i < graphPointsOutput.length; i++)
+                              FlSpot(
+                                  graphPointsOutput[i].keys.first,
+                                  graphPointsOutput[i]
+                                      .values
+                                      .first) //FlSpot(0, 0),
+                          ],
+                          color: Colors.blue,
+                        )
+                      ],
+                      titlesData: const FlTitlesData(
+                        leftTitles: AxisTitles(
+                          axisNameWidget: Text('F(x)'),
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: AxisTitles(),
+                        bottomTitles: AxisTitles(
+                          axisNameWidget: Text('x'),
+                          sideTitles: SideTitles(showTitles: true),
+                        ),
+                      )))
+                  : const Center(child: Text('Graph will appear here')),
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Padding(

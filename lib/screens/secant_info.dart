@@ -201,6 +201,17 @@ class SecantInfo extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
             child: ListTile(
               leading: const Text('h.'),
+              title: const Text(
+                  'Secant method may return looping or backwards graph.'),
+              style: Theme.of(context).listTileTheme.style,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+            child: ListTile(
+              leading: const Text('i.'),
               title: InkWell(
                 onTap: () =>
                     _launchURL('https://en.wikipedia.org/wiki/Secant_method'),

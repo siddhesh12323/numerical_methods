@@ -111,6 +111,17 @@ class _BisectionInfoState extends State<BisectionInfo> {
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
               child: ListTile(
                 leading: const Text('h.'),
+                title: const Text(
+                    'If the graph is in loop or returning backwards, the range may be too big, try changing the values of a and b.'),
+                style: Theme.of(context).listTileTheme.style,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+              child: ListTile(
+                leading: const Text('i.'),
                 title: InkWell(
                   onTap: () => _launchURL(
                       'https://en.wikipedia.org/wiki/Bisection_method'),
